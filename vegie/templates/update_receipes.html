@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block start %}
+
+<div class="container mt-5">
+
+    <div class="card shadow p-4">
+
+        <h2 class="mb-4">Update Recipe</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label>Recipe Name</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    name="receipe_name"
+                    value="{{ receipe.receipe_name }}">
+            </div>
+
+            <div class="mb-3">
+                <label>Description</label>
+                <textarea
+                    class="form-control"
+                    rows="5"
+                    name="receipe_description">{{ receipe.receipe_description }}</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label>Current Image</label><br>
+
+                <img src="{{ receipe.receipe_image.url }}"
+                     width="150"
+                     class="rounded shadow">
+            </div>
+
+            <div class="mb-3">
+                <label>Choose New Image</label>
+                <input
+                    type="file"
+                    class="form-control"
+                    name="receipe_image">
+            </div>
+
+            <button class="btn btn-success">
+                Update Recipe
+            </button>
+
+            <a href="{% url 'receipes' %}" class="btn btn-secondary">
+                Cancel
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

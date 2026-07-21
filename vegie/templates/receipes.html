@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block start %}
+
+<div class="container py-5">
+
+    <!-- Heading -->
+    <div class="text-center mb-5">
+        <h1 class="fw-bold display-5">🍽 Recipe Dashboard</h1>
+        <p class="text-muted">
+            Create, manage and organize your delicious recipes.
+        </p>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Left Side : Add Recipe Form -->
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-lg rounded-4">
+
+                <div class="card-body p-4">
+
+                    <h3 class="fw-bold mb-4">
+                        Add Recipe
+                    </h3>
+
+                    <form method="POST" enctype="multipart/form-data">
+
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Recipe Name
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control form-control-lg rounded-3"
+                                name="receipe_name"
+                                placeholder="Chicken Biryani">
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+                                Description
+                            </label>
+
+                            <textarea
+                                class="form-control rounded-3"
+                                rows="5"
+                                name="receipe_description"
+                                placeholder="Write recipe description..."></textarea>
+
+                        </div>
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Upload Image
+                            </label>
+
+                            <input
+                                type="file"
+                                class="form-control rounded-3"
+                                name="receipe_image">
+
+                        </div>
+
+                        <button class="btn btn-dark w-100 py-3 rounded-3">
+                            Save Recipe
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Right Side : Recipe List -->
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-lg rounded-4">
+
+                <div class="card-body">
+
+                    <!-- Heading + Search -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+
+                        <h3 class="fw-bold mb-0">
+                            All Recipes
+                        </h3>
+
+                        <form method="GET" class="w-50">
+
+                            <div class="input-group">
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    name="search"
+                                    placeholder="🔍 Search Recipe..."
+                                    value="{{ request.GET.search }}">
+
+                                <button class="btn btn-primary" type="submit">
+                                    Search
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                    <div class="table-responsive">
+
+                        <table class="table align-middle table-hover">
+
+                            <thead class="table-light">
+
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {% for receipe in receipes %}
+
+                                <tr>
+
+                                    <td width="120">
+
+                                        <img
+                                            src="{{ receipe.receipe_image.url }}"
+                                            class="rounded-4 shadow"
+                                            width="90"
+                                            height="90"
+                                            style="object-fit: cover;">
+
+                                    </td>
+
+                                    <td>
+
+                                        <h6 class="fw-bold mb-0">
+                                            {{ receipe.receipe_name }}
+                                        </h6>
+
+                                    </td>
+
+                                    <td>
+
+                                        <small class="text-muted">
+                                            {{ receipe.receipe_description }}
+                                        </small>
+
+                                    </td>
+
+                                    <td>
+
+                                        <div class="d-flex gap-2">
+
+                                            <a href="{% url 'update_receipe' receipe.id %}"
+                                               class="btn btn-outline-success btn-sm rounded-pill">
+                                                Update
+                                            </a>
+
+                                            <a href="{% url 'delete_receipes' receipe.id %}"
+                                               class="btn btn-outline-danger btn-sm rounded-pill">
+                                                Delete
+                                            </a>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                                {% empty %}
+
+                                <tr>
+
+                                    <td colspan="4">
+
+                                        <div class="text-center py-5">
+
+                                            <h4>No Recipes Found</h4>
+
+                                            <p class="text-muted">
+                                                Add your first recipe.
+                                            </p>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
