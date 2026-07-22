@@ -1,32 +1,51 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Receipe
+from django.contrib import messages
 
 
 @login_required(login_url='login')
 def receipes(request):
-    
-    print(request.user)
-    print(request.user.is_authenticated)
 
+    # Admin cannot create recipes
+    if request.user.is_staff and request.method == "POST":
+        messages.error(request, "Admin cannot create recipes.")
+        return redirect("receipes")
+
+ # Normal user can create
     if request.method == "POST":
         receipe_name = request.POST.get("receipe_name")
         receipe_description = request.POST.get("receipe_description")
         receipe_image = request.FILES.get("receipe_image")
-
-        Receipe.objects.create(
+        
+        print(request.user)
+        print(request.user.is_authenticated)
+        print(request.user.id)
+       
+        receipe =  Receipe.objects.create(
+            user=request.user,
             receipe_name=receipe_name,
             receipe_description=receipe_description,
             receipe_image=receipe_image,
         )
+        
+        print(receipe.user)
+        print(receipe.user_id)
+
+        receipe.save()
 
         return redirect("receipes")
+    
+    
+    if request.user.is_staff:
+        queryset = Receipe.objects.all().order_by("user__username", "id")
+    else:
+       queryset = Receipe.objects.filter(user=request.user)
 
-    queryset = Receipe.objects.all()
-
-    if request.GET.get("search"):
+    search = request.GET.get("search")
+    if search:
         queryset = queryset.filter(
-            receipe_name__icontains=request.GET.get("search")
+            receipe_name__icontains=search
         )
 
     context = {
@@ -39,7 +58,14 @@ def receipes(request):
 @login_required(login_url='login')
 def update_receipe(request, id):
 
-    receipe = Receipe.objects.get(id=id)
+    if request.user.is_staff:
+        receipe = get_object_or_404(Receipe, id=id)
+    else: 
+       receipe = get_object_or_404(
+        Receipe,
+        id=id,
+        user=request.user
+    )
 
     if request.method == "POST":
         receipe.receipe_name = request.POST.get("receipe_name")
@@ -62,7 +88,18 @@ def update_receipe(request, id):
 @login_required(login_url='login')
 def delete_receipe(request, id):
 
-    receipe = Receipe.objects.get(id=id)
+    if request.user.is_staff:
+        receipe = get_object_or_404(
+            Receipe,
+            id=id
+        )
+    else:
+        receipe = get_object_or_404(
+            Receipe,
+            id=id,
+            user=request.user
+        )
+
     receipe.delete()
 
     return redirect("receipes")
